@@ -3,10 +3,17 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import models
 from database import engine
-from routers import movies, functions, tickets
+from routers import movies, functions, tickets, auth
+from seed import seed
 
 # Crear las tablas en la base de datos (para SQLite local esto es automático)
 models.Base.metadata.create_all(bind=engine)
+
+# Poblar la base de datos automáticamente si está vacía (ideal para Render)
+try:
+    seed()
+except Exception as e:
+    print("Error al poblar BD:", e)
 
 app = FastAPI(
     title="Cinepolito API",
@@ -27,6 +34,7 @@ app.add_middleware(
 app.include_router(movies.router)
 app.include_router(functions.router)
 app.include_router(tickets.router)
+app.include_router(auth.router)
 
 @app.get("/")
 def root():

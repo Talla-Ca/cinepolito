@@ -1,6 +1,28 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 from datetime import datetime
+
+class UserBase(BaseModel):
+    email: EmailStr
+    full_name: str
+    is_admin: bool = False
+
+class UserCreate(UserBase):
+    password: str
+
+class User(UserBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    user: User
+
+class TokenData(BaseModel):
+    email: Optional[str] = None
 
 class MovieBase(BaseModel):
     title: str
@@ -51,6 +73,7 @@ class TicketBase(BaseModel):
     function_id: int
     seat_number: str
     customer_name: str
+    user_id: Optional[int] = None
 
 class TicketCreate(TicketBase):
     pass
@@ -58,6 +81,7 @@ class TicketCreate(TicketBase):
 class Ticket(TicketBase):
     id: int
     function: Optional[Function] = None
+    user: Optional[User] = None
 
     class Config:
         from_attributes = True

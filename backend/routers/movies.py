@@ -15,8 +15,10 @@ def read_movies(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     movies = db.query(models.Movie).offset(skip).limit(limit).all()
     return movies
 
+from routers.auth import get_current_admin_user
+
 @router.post("/", response_model=schemas.Movie)
-def create_movie(movie: schemas.MovieCreate, db: Session = Depends(get_db)):
+def create_movie(movie: schemas.MovieCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_admin_user)):
     db_movie = models.Movie(**movie.model_dump())
     db.add(db_movie)
     db.commit()

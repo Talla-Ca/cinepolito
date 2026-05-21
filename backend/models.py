@@ -2,6 +2,17 @@ from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, F
 from sqlalchemy.orm import relationship
 from database import Base
 
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+    full_name = Column(String)
+    is_admin = Column(Boolean, default=False)
+
+    tickets = relationship("Ticket", back_populates="user")
+
 class Movie(Base):
     __tablename__ = "movies"
 
@@ -40,7 +51,9 @@ class Ticket(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     function_id = Column(Integer, ForeignKey("functions.id"))
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     seat_number = Column(String)
     customer_name = Column(String)
 
     function = relationship("Function", back_populates="tickets")
+    user = relationship("User", back_populates="tickets")
