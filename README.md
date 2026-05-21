@@ -16,5 +16,3 @@ Las siguientes cuentas se crean por defecto cuando se inicializa (seed) la base 
 ## Despliegue en Render
 El proyecto está optimizado para desplegarse como un servicio único en Render usando Docker (Multi-stage build). Render construirá el frontend y lo servirá automáticamente junto con la API de FastAPI.
 
-
-Falta crear el registro de nuevos usuarios la carga de imagenes locales archivo de imagenes, verificar que todo esta funcionando correctamente y que se pueda registrar nuevos usuarios, crear funciones y que se puedan ver las peliculas en cartelera.

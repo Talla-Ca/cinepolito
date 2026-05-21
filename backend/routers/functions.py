@@ -27,3 +27,26 @@ def create_function(function: schemas.FunctionCreate, db: Session = Depends(get_
     db.commit()
     db.refresh(db_function)
     return db_function
+
+@router.put("/{function_id}", response_model=schemas.Function)
+def update_function(function_id: int, function: schemas.FunctionCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_admin_user)):
+    db_function = db.query(models.Function).filter(models.Function.id == function_id).first()
+    if not db_function:
+        raise HTTPException(status_code=404, detail="Function not found")
+    
+    for key, value in function.model_dump().items():
+        setattr(db_function, key, value)
+        
+    db.commit()
+    db.refresh(db_function)
+    return db_function
+
+@router.delete("/{function_id}")
+def delete_function(function_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_admin_user)):
+    db_function = db.query(models.Function).filter(models.Function.id == function_id).first()
+    if not db_function:
+        raise HTTPException(status_code=404, detail="Function not found")
+    
+    db.delete(db_function)
+    db.commit()
+    return {"message": "Function deleted successfully"}

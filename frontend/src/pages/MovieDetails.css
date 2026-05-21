@@ -16,12 +16,20 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  background-color: var(--primary); /* Fondo azul por si no hay imagen */
+  aspect-ratio: 2 / 3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
 }
 
 .movie-poster-large img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   display: block;
+  background-color: var(--primary); /* Asegurar que mantenga fondo azul */
 }
 
 .movie-info-large {
