@@ -88,6 +88,18 @@ def update_user_role(user_id: int, is_admin: bool, current_user: models.User = D
     db.commit()
     return {"message": "User role updated successfully"}
 
+@router.put("/users/{user_id}")
+def update_user(user_id: int, user_update: schemas.UserBase, current_user: models.User = Depends(get_current_admin_user), db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user.full_name = user_update.full_name
+    user.email = user_update.email
+    db.commit()
+    db.refresh(user)
+    return user
+
 @router.post("/register", response_model=schemas.User)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == user.email).first()

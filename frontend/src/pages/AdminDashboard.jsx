@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { createMovie, getMovies, deleteMovie, uploadMovieImage } from '../api/movies';
-import { createFunction, getFunctionsByMovie, deleteFunction } from '../api/functions';
-import { getUsers, deleteUser, updateUserRole } from '../api/auth';
-import { Film, CalendarPlus, Users, PlusCircle, Trash2, Edit, Search, Image as ImageIcon } from 'lucide-react';
+import { createMovie, getMovies, deleteMovie, updateMovie, uploadMovieImage } from '../api/movies';
+import { createFunction, getAllFunctions, deleteFunction, updateFunction } from '../api/functions';
+import { getUsers, deleteUser, updateUserRole, updateUser } from '../api/auth';
+import { Film, CalendarPlus, Users, PlusCircle, Trash2, Edit, Search, XCircle } from 'lucide-react';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -17,14 +17,18 @@ const AdminDashboard = () => {
   const [userSearch, setUserSearch] = useState('');
 
   // States for forms
-  const [movieData, setMovieData] = useState({
-    title: '', description: '', duration_minutes: 120, poster_url: ''
-  });
+  const initialMovieData = { title: '', description: '', duration_minutes: 120, poster_url: '' };
+  const [movieData, setMovieData] = useState(initialMovieData);
   const [imageFile, setImageFile] = useState(null);
+  const [editingMovieId, setEditingMovieId] = useState(null);
   
-  const [functionData, setFunctionData] = useState({
-    movie_id: '', room_id: '1', start_time: '', price: 80
-  });
+  const initialFunctionData = { movie_id: '', room_id: '1', start_time: '', price: 80 };
+  const [functionData, setFunctionData] = useState(initialFunctionData);
+  const [editingFunctionId, setEditingFunctionId] = useState(null);
+
+  const initialUserData = { full_name: '', email: '', is_admin: false };
+  const [userDataForm, setUserDataForm] = useState(initialUserData);
+  const [editingUserId, setEditingUserId] = useState(null);
 
   const [message, setMessage] = useState({ type: '', text: '' });
 
@@ -42,14 +46,14 @@ const AdminDashboard = () => {
       setMoviesList(mvs);
       const usr = await getUsers();
       setUsersList(usr);
-      // Fetch all functions by hitting a general endpoint if we change it or just loading them (we will fetch per movie but for admin maybe we need all. Wait, getFunctionsByMovie without param returns all in backend)
-      const fns = await getFunctionsByMovie(''); // If movie_id is empty, backend ignores it
+      const fns = await getAllFunctions();
       setFunctionsList(fns);
     } catch (err) {
       console.error(err);
     }
   };
 
+  // --- MOVIE HANDLERS ---
   const handleMovieSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -59,14 +63,33 @@ const AdminDashboard = () => {
         finalPosterUrl = uploadRes.imageUrl;
       }
       
-      await createMovie({ ...movieData, poster_url: finalPosterUrl });
-      setMessage({ type: 'success', text: 'Película agregada con éxito' });
-      setMovieData({ title: '', description: '', duration_minutes: 120, poster_url: '' });
-      setImageFile(null);
+      const dataToSubmit = { ...movieData, poster_url: finalPosterUrl };
+      
+      if (editingMovieId) {
+        await updateMovie(editingMovieId, dataToSubmit);
+        setMessage({ type: 'success', text: 'Película actualizada con éxito' });
+      } else {
+        await createMovie(dataToSubmit);
+        setMessage({ type: 'success', text: 'Película agregada con éxito' });
+      }
+      cancelMovieEdit();
       fetchData();
     } catch (err) {
-      setMessage({ type: 'error', text: 'Error al agregar película' });
+      setMessage({ type: 'error', text: 'Error al procesar película' });
     }
+  };
+
+  const handleEditMovie = (m) => {
+    setEditingMovieId(m.id);
+    setMovieData({ title: m.title, description: m.description, duration_minutes: m.duration_minutes, poster_url: m.poster_url || '' });
+    setImageFile(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelMovieEdit = () => {
+    setEditingMovieId(null);
+    setMovieData(initialMovieData);
+    setImageFile(null);
   };
 
   const handleDeleteMovie = async (id) => {
@@ -81,19 +104,41 @@ const AdminDashboard = () => {
     }
   };
 
+  // --- FUNCTION HANDLERS ---
   const handleFunctionSubmit = async (e) => {
     e.preventDefault();
     try {
       let isoDate = new Date(functionData.start_time).toISOString();
-      await createFunction({
-        ...functionData,
-        start_time: isoDate
-      });
-      setMessage({ type: 'success', text: 'Función programada con éxito' });
+      const dataToSubmit = { ...functionData, start_time: isoDate };
+      
+      if (editingFunctionId) {
+        await updateFunction(editingFunctionId, dataToSubmit);
+        setMessage({ type: 'success', text: 'Función actualizada con éxito' });
+      } else {
+        await createFunction(dataToSubmit);
+        setMessage({ type: 'success', text: 'Función programada con éxito' });
+      }
+      cancelFunctionEdit();
       fetchData();
     } catch (err) {
-      setMessage({ type: 'error', text: 'Error al programar función' });
+      setMessage({ type: 'error', text: 'Error al procesar función' });
     }
+  };
+
+  const handleEditFunction = (f) => {
+    setEditingFunctionId(f.id);
+    // Convert UTC to local datetime-local format format: YYYY-MM-DDTHH:mm
+    const date = new Date(f.start_time);
+    const tzOffset = date.getTimezoneOffset() * 60000; 
+    const localISOTime = (new Date(date.getTime() - tzOffset)).toISOString().slice(0, 16);
+    
+    setFunctionData({ movie_id: f.movie_id, room_id: f.room_id, start_time: localISOTime, price: f.price });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelFunctionEdit = () => {
+    setEditingFunctionId(null);
+    setFunctionData(initialFunctionData);
   };
 
   const handleDeleteFunction = async (id) => {
@@ -106,6 +151,32 @@ const AdminDashboard = () => {
         setMessage({ type: 'error', text: 'Error al eliminar función' });
       }
     }
+  };
+
+  // --- USER HANDLERS ---
+  const handleUserSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingUserId) {
+        await updateUser(editingUserId, { full_name: userDataForm.full_name, email: userDataForm.email, is_admin: userDataForm.is_admin });
+        setMessage({ type: 'success', text: 'Usuario actualizado con éxito' });
+      }
+      cancelUserEdit();
+      fetchData();
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Error al actualizar usuario' });
+    }
+  };
+
+  const handleEditUser = (u) => {
+    setEditingUserId(u.id);
+    setUserDataForm({ full_name: u.full_name, email: u.email, is_admin: u.is_admin });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelUserEdit = () => {
+    setEditingUserId(null);
+    setUserDataForm(initialUserData);
   };
 
   const handleDeleteUser = async (id) => {
@@ -145,22 +216,13 @@ const AdminDashboard = () => {
       </div>
 
       <div className="admin-tabs">
-        <button 
-          className={`tab-btn ${activeTab === 'movies' ? 'active' : ''}`}
-          onClick={() => setActiveTab('movies')}
-        >
+        <button className={`tab-btn ${activeTab === 'movies' ? 'active' : ''}`} onClick={() => {setActiveTab('movies'); cancelMovieEdit();}}>
           <Film size={18} /> Películas
         </button>
-        <button 
-          className={`tab-btn ${activeTab === 'functions' ? 'active' : ''}`}
-          onClick={() => setActiveTab('functions')}
-        >
+        <button className={`tab-btn ${activeTab === 'functions' ? 'active' : ''}`} onClick={() => {setActiveTab('functions'); cancelFunctionEdit();}}>
           <CalendarPlus size={18} /> Funciones
         </button>
-        <button 
-          className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
-          onClick={() => setActiveTab('users')}
-        >
+        <button className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`} onClick={() => {setActiveTab('users'); cancelUserEdit();}}>
           <Users size={18} /> Usuarios
         </button>
       </div>
@@ -176,7 +238,7 @@ const AdminDashboard = () => {
         {activeTab === 'movies' && (
           <div>
             <form onSubmit={handleMovieSubmit} className="admin-form">
-              <h3><PlusCircle size={20}/> Registrar Nueva Película</h3>
+              <h3>{editingMovieId ? <><Edit size={20}/> Editar Película</> : <><PlusCircle size={20}/> Registrar Nueva Película</>}</h3>
               <div className="form-group">
                 <label>Título</label>
                 <input type="text" required value={movieData.title} onChange={e => setMovieData({...movieData, title: e.target.value})} />
@@ -203,7 +265,10 @@ const AdminDashboard = () => {
                   }} />
                 </div>
               </div>
-              <button type="submit" className="btn btn-primary">Guardar Película</button>
+              <div style={{display:'flex', gap:'10px'}}>
+                <button type="submit" className="btn btn-primary">{editingMovieId ? 'Actualizar Película' : 'Guardar Película'}</button>
+                {editingMovieId && <button type="button" onClick={cancelMovieEdit} className="btn btn-secondary"><XCircle size={18}/> Cancelar</button>}
+              </div>
             </form>
 
             <div className="admin-users-list" style={{marginTop: '40px'}}>
@@ -225,6 +290,9 @@ const AdminDashboard = () => {
                         <td>{m.title}</td>
                         <td>{m.duration_minutes} min</td>
                         <td style={{display:'flex', gap:'10px'}}>
+                          <button onClick={() => handleEditMovie(m)} className="btn btn-primary" style={{padding:'6px 12px', fontSize:'0.8rem'}}>
+                            <Edit size={14}/> Editar
+                          </button>
                           <button onClick={() => handleDeleteMovie(m.id)} className="btn btn-danger" style={{padding:'6px 12px', fontSize:'0.8rem'}}>
                             <Trash2 size={14}/> Eliminar
                           </button>
@@ -242,7 +310,7 @@ const AdminDashboard = () => {
         {activeTab === 'functions' && (
           <div>
             <form onSubmit={handleFunctionSubmit} className="admin-form">
-              <h3><CalendarPlus size={20}/> Programar Nueva Función</h3>
+              <h3>{editingFunctionId ? <><Edit size={20}/> Editar Función</> : <><CalendarPlus size={20}/> Programar Nueva Función</>}</h3>
               <div className="form-group">
                 <label>Película</label>
                 <select required value={functionData.movie_id} onChange={e => setFunctionData({...functionData, movie_id: parseInt(e.target.value)})}>
@@ -270,7 +338,10 @@ const AdminDashboard = () => {
                 <label>Fecha y Hora</label>
                 <input type="datetime-local" required value={functionData.start_time} onChange={e => setFunctionData({...functionData, start_time: e.target.value})} />
               </div>
-              <button type="submit" className="btn btn-primary">Crear Función</button>
+              <div style={{display:'flex', gap:'10px'}}>
+                <button type="submit" className="btn btn-primary">{editingFunctionId ? 'Actualizar Función' : 'Crear Función'}</button>
+                {editingFunctionId && <button type="button" onClick={cancelFunctionEdit} className="btn btn-secondary"><XCircle size={18}/> Cancelar</button>}
+              </div>
             </form>
 
             <div className="admin-users-list" style={{marginTop: '40px'}}>
@@ -294,6 +365,9 @@ const AdminDashboard = () => {
                         <td>Sala {f.room_id}</td>
                         <td>{new Date(f.start_time).toLocaleString()}</td>
                         <td style={{display:'flex', gap:'10px'}}>
+                          <button onClick={() => handleEditFunction(f)} className="btn btn-primary" style={{padding:'6px 12px', fontSize:'0.8rem'}}>
+                            <Edit size={14}/> Editar
+                          </button>
                           <button onClick={() => handleDeleteFunction(f.id)} className="btn btn-danger" style={{padding:'6px 12px', fontSize:'0.8rem'}}>
                             <Trash2 size={14}/> Eliminar
                           </button>
@@ -310,6 +384,27 @@ const AdminDashboard = () => {
         {/* --- TAB: USUARIOS --- */}
         {activeTab === 'users' && (
           <div className="admin-users-list">
+            
+            {editingUserId && (
+              <form onSubmit={handleUserSubmit} className="admin-form" style={{marginBottom: '30px'}}>
+                <h3><Edit size={20}/> Editar Usuario</h3>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" required value={userDataForm.full_name} onChange={e => setUserDataForm({...userDataForm, full_name: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>Correo Electrónico</label>
+                    <input type="email" required value={userDataForm.email} onChange={e => setUserDataForm({...userDataForm, email: e.target.value})} />
+                  </div>
+                </div>
+                <div style={{display:'flex', gap:'10px'}}>
+                  <button type="submit" className="btn btn-primary">Actualizar Usuario</button>
+                  <button type="button" onClick={cancelUserEdit} className="btn btn-secondary"><XCircle size={18}/> Cancelar</button>
+                </div>
+              </form>
+            )}
+
             <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'20px'}}>
               <h3>Gestión de Usuarios</h3>
               <div className="search-box" style={{display:'flex', alignItems:'center', background:'#fff', padding:'5px 15px', borderRadius:'20px', border:'1px solid #ccc'}}>
@@ -344,6 +439,9 @@ const AdminDashboard = () => {
                         {u.is_admin ? <span className="badge-admin">Admin</span> : <span className="badge-user">Usuario</span>}
                       </td>
                       <td style={{display:'flex', gap:'10px'}}>
+                        <button onClick={() => handleEditUser(u)} className="btn btn-primary" style={{padding:'6px 12px', fontSize:'0.8rem'}}>
+                          <Edit size={14}/> Editar
+                        </button>
                         <button onClick={() => handleToggleAdmin(u)} className="btn btn-secondary" style={{padding:'6px 12px', fontSize:'0.8rem'}}>
                           {u.is_admin ? 'Quitar Admin' : 'Hacer Admin'}
                         </button>

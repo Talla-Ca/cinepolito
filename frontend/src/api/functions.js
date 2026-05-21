@@ -5,6 +5,11 @@ export const getFunctionsByMovie = async (movieId) => {
   return response.data;
 };
 
+export const getAllFunctions = async () => {
+  const response = await api.get('/functions/');
+  return response.data;
+};
+
 export const createFunction = async (functionData) => {
   const response = await api.post('/functions/', functionData);
   return response.data;
