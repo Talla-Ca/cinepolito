@@ -202,9 +202,13 @@ const AdminDashboard = () => {
   };
 
   const filteredUsers = usersList.filter(u => 
-    u.full_name.toLowerCase().includes(userSearch.toLowerCase()) || 
-    u.email.toLowerCase().includes(userSearch.toLowerCase())
+    (u.full_name || '').toLowerCase().includes((userSearch || '').toLowerCase()) || 
+    (u.email || '').toLowerCase().includes((userSearch || '').toLowerCase())
   );
+
+  const filteredFunctions = functionData.movie_id 
+    ? functionsList.filter(f => f.movie_id === parseInt(functionData.movie_id))
+    : functionsList;
 
   if (!user || !user.is_admin) return null;
 
@@ -253,12 +257,12 @@ const AdminDashboard = () => {
                   <input type="number" required value={movieData.duration_minutes} onChange={e => setMovieData({...movieData, duration_minutes: parseInt(e.target.value)})} />
                 </div>
                 <div className="form-group">
-                  <label>Subir Póster</label>
+                  <label>Subir Póster (Para uso local)</label>
                   <input type="file" accept="image/*" onChange={e => {
                     setImageFile(e.target.files[0]);
                     setMovieData({...movieData, poster_url: ''});
                   }} />
-                  <small style={{display:'block', marginTop:'5px', color:'var(--text-muted)'}}>O ingresa una URL web:</small>
+                  <small style={{display:'block', marginTop:'5px', color:'var(--text-muted)'}}>O ingresa una URL web (Recomendado para Render):</small>
                   <input type="text" placeholder="https://..." value={movieData.poster_url} onChange={e => {
                     setMovieData({...movieData, poster_url: e.target.value});
                     setImageFile(null);
@@ -345,7 +349,7 @@ const AdminDashboard = () => {
             </form>
 
             <div className="admin-users-list" style={{marginTop: '40px'}}>
-              <h3>Funciones Existentes</h3>
+              <h3>Funciones Existentes {functionData.movie_id ? `(Mostrando solo seleccionadas)` : ''}</h3>
               <div className="table-responsive">
                 <table className="admin-table">
                   <thead>
@@ -358,17 +362,17 @@ const AdminDashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {functionsList.map(f => (
+                    {filteredFunctions.map(f => (
                       <tr key={f.id}>
                         <td>{f.id}</td>
                         <td>{moviesList.find(m => m.id === f.movie_id)?.title || f.movie_id}</td>
                         <td>Sala {f.room_id}</td>
                         <td>{new Date(f.start_time).toLocaleString()}</td>
                         <td style={{display:'flex', gap:'10px'}}>
-                          <button onClick={() => handleEditFunction(f)} className="btn btn-primary" style={{padding:'6px 12px', fontSize:'0.8rem'}}>
+                          <button type="button" onClick={() => handleEditFunction(f)} className="btn btn-primary" style={{padding:'6px 12px', fontSize:'0.8rem'}}>
                             <Edit size={14}/> Editar
                           </button>
-                          <button onClick={() => handleDeleteFunction(f.id)} className="btn btn-danger" style={{padding:'6px 12px', fontSize:'0.8rem'}}>
+                          <button type="button" onClick={() => handleDeleteFunction(f.id)} className="btn btn-danger" style={{padding:'6px 12px', fontSize:'0.8rem'}}>
                             <Trash2 size={14}/> Eliminar
                           </button>
                         </td>
