@@ -42,6 +42,15 @@ app.include_router(auth.router)
 # Configuración para servir el frontend de React
 frontend_dist = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", "dist")
 
+@app.get("/api/seed")
+def force_seed():
+    try:
+        seed()
+        return {"message": "Base de datos poblada exitosamente. Revisa la cartelera ahora."}
+    except Exception as e:
+        import traceback
+        return {"error": str(e), "traceback": traceback.format_exc()}
+
 if os.path.exists(frontend_dist):
     # Montar la carpeta de assets (JS, CSS, etc) de Vite
     app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist, "assets")), name="assets")
