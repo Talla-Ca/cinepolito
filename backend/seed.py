@@ -14,8 +14,8 @@ def seed():
     users_to_create = [
         {"email": "admin@cinepolis.com", "password": "admin", "name": "Administrador", "is_admin": True},
         {"email": "test@cinepolis.com", "password": "123456", "name": "Usuario de Prueba", "is_admin": False},
-        {"email": "talla", "password": "talla", "name": "Usuario Talla", "is_admin": False},
-        {"email": "pasos", "password": "pasos", "name": "Usuario Pasos", "is_admin": False},
+        {"email": "talla@cinepolis.com", "password": "talla", "name": "Usuario Talla", "is_admin": False},
+        {"email": "pasos@cinepolis.com", "password": "pasos", "name": "Usuario Pasos", "is_admin": False},
     ]
 
     for u in users_to_create:
@@ -36,91 +36,91 @@ def seed():
                 title="The Mandalorian & Grogu",
                 description="El mandaloriano y su aprendiz Grogu emprenden una nueva aventura galáctica en la gran pantalla.",
                 duration_minutes=120,
-                poster_url="https://image.tmdb.org/t/p/w500/z6csAHAoJ93yVq1HkCgDkL11V2S.jpg" # URL representativa
+                poster_url="https://placehold.co/500x750/0b1c36/ffffff?text=Mandalorian+&+Grogu"
             ),
             models.Movie(
                 title="Michael",
                 description="La película biográfica definitiva que narra la compleja vida y el inmenso legado del Rey del Pop, Michael Jackson.",
                 duration_minutes=135,
-                poster_url="https://image.tmdb.org/t/p/w500/8tS2Dk14D0G5t8M01mD0T1L6kS1.jpg"
+                poster_url="https://placehold.co/500x750/0b1c36/ffffff?text=Michael"
             ),
             models.Movie(
                 title="Mortal Kombat 2",
                 description="Los defensores de la Tierra se preparan para el torneo definitivo contra las fuerzas de Outworld.",
                 duration_minutes=115,
-                poster_url="https://image.tmdb.org/t/p/w500/m1vGGB9l5B9WcWpI6A5M5FwM7m2.jpg"
+                poster_url="https://placehold.co/500x750/0b1c36/ffffff?text=Mortal+Kombat+2"
             ),
             models.Movie(
                 title="Scary Movie 6",
                 description="Una nueva y divertidísima parodia de las películas de terror más populares de la última década.",
                 duration_minutes=95,
-                poster_url="https://image.tmdb.org/t/p/w500/8qBylBsQf4llkGrRR3wNw4C7E6m.jpg"
+                poster_url="https://placehold.co/500x750/0b1c36/ffffff?text=Scary+Movie+6"
             ),
             models.Movie(
                 title="Ovejas Asesinas",
                 description="Un experimento genético sale terriblemente mal en una granja, convirtiendo a las inofensivas ovejas en depredadores sedientos de sangre.",
                 duration_minutes=102,
-                poster_url="https://image.tmdb.org/t/p/w500/2L3A3dO1P3M3n6T8aK8n1B9aK9.jpg"
+                poster_url="https://placehold.co/500x750/0b1c36/ffffff?text=Ovejas+Asesinas"
             ),
             models.Movie(
                 title="Amos del Universo",
                 description="He-Man debe defender el Castillo de Grayskull de las fuerzas del malvado Skeletor en una épica batalla en Eternia.",
                 duration_minutes=125,
-                poster_url="https://image.tmdb.org/t/p/w500/7V9aA7x3C1T8q3F2X9aP6m4T8a.jpg"
+                poster_url="https://placehold.co/500x750/0b1c36/ffffff?text=Amos+del+Universo"
             ),
             models.Movie(
                 title="The Backrooms",
                 description="Un adolescente descubre un portal a una dimensión infinita y terrorífica de pasillos amarillos y luces fluorescentes zumbantes.",
                 duration_minutes=110,
-                poster_url="https://image.tmdb.org/t/p/w500/3A4pX9m2B8aT1C6v4N2x5M8V6t.jpg"
+                poster_url="https://placehold.co/500x750/0b1c36/ffffff?text=The+Backrooms"
             ),
             models.Movie(
                 title="Dune: Parte Dos",
                 description="Paul Atreides se une a Chani y a los Fremen en su camino de venganza contra los conspiradores que destruyeron a su familia.",
                 duration_minutes=166,
-                poster_url="https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2JGjjc9k5.jpg"
+                poster_url="https://placehold.co/500x750/0b1c36/ffffff?text=Dune+2"
             ),
             models.Movie(
                 title="Spider-Man: Beyond the Spider-Verse",
                 description="Miles Morales se enfrenta al desafío final en el multiverso en la esperada conclusión de la trilogía animada.",
                 duration_minutes=140,
-                poster_url="https://image.tmdb.org/t/p/w500/8b8R8l88ILm8V6n4w5S9V2B5s5.jpg"
+                poster_url="https://placehold.co/500x750/0b1c36/ffffff?text=Spider-Man"
             ),
             models.Movie(
                 title="Shrek 5",
                 description="El ogro más querido regresa al pantano con una nueva aventura para toda la familia y viejos amigos.",
                 duration_minutes=98,
-                poster_url="https://image.tmdb.org/t/p/w500/4c3b3M8v9T7h5A2x1S6n8B5v6c.jpg"
+                poster_url="https://placehold.co/500x750/0b1c36/ffffff?text=Shrek+5"
             ),
             models.Movie(
                 title="The Batman Part II",
                 description="El Caballero de la Noche se enfrenta a nuevas amenazas en una ciudad de Gotham cada vez más corrupta y peligrosa.",
                 duration_minutes=155,
-                poster_url="https://image.tmdb.org/t/p/w500/2L7a4N1m6T3x5B8v9S2c5M6n5.jpg"
+                poster_url="https://placehold.co/500x750/0b1c36/ffffff?text=The+Batman+2"
             ),
             models.Movie(
                 title="Avengers: Doomsday",
                 description="Los Vengadores deben unirse una vez más para enfrentar a Doctor Doom en un evento que cambiará el universo.",
                 duration_minutes=150,
-                poster_url="https://image.tmdb.org/t/p/w500/7h5A2x1S6n8B5v6c4c3b3M8v9.jpg"
+                poster_url="https://placehold.co/500x750/0b1c36/ffffff?text=Avengers"
             ),
             models.Movie(
                 title="Super Mario Bros 2",
                 description="Mario y Luigi descubren nuevas galaxias y se enfrentan a Bowser una vez más con la ayuda de Yoshi.",
                 duration_minutes=105,
-                poster_url="https://image.tmdb.org/t/p/w500/5M6n52L7a4N1m6T3x5B8v9S2c.jpg"
+                poster_url="https://placehold.co/500x750/0b1c36/ffffff?text=Super+Mario+2"
             ),
             models.Movie(
                 title="Superman",
                 description="El Hombre de Acero inicia una nueva era de heroísmo en Metropolis.",
                 duration_minutes=130,
-                poster_url="https://image.tmdb.org/t/p/w500/3x5B8v9S2c5M6n52L7a4N1m6T.jpg"
+                poster_url="https://placehold.co/500x750/0b1c36/ffffff?text=Superman"
             ),
             models.Movie(
                 title="Jurassic World 4",
                 description="Una nueva era jurásica comienza, explorando un mundo donde los dinosaurios y los humanos intentan coexistir.",
                 duration_minutes=128,
-                poster_url="https://image.tmdb.org/t/p/w500/9S2c5M6n52L7a4N1m6T3x5B8v.jpg"
+                poster_url="https://placehold.co/500x750/0b1c36/ffffff?text=Jurassic+World"
             )
         ]
         

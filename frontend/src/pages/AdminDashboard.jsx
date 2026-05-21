@@ -127,8 +127,8 @@ const AdminDashboard = () => {
                 <input type="number" required value={movieData.duration_minutes} onChange={e => setMovieData({...movieData, duration_minutes: parseInt(e.target.value)})} />
               </div>
               <div className="form-group">
-                <label>URL del Póster</label>
-                <input type="url" required placeholder="https://..." value={movieData.poster_url} onChange={e => setMovieData({...movieData, poster_url: e.target.value})} />
+                <label>URL o Ruta local del Póster</label>
+                <input type="text" required placeholder="https://... o /assets/images/..." value={movieData.poster_url} onChange={e => setMovieData({...movieData, poster_url: e.target.value})} />
               </div>
             </div>
             <button type="submit" className="btn btn-primary">Guardar Película</button>
